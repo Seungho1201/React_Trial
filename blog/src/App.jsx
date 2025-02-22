@@ -21,26 +21,49 @@ function App() {
   // state 언제 씀? -> 변경시 자동으로 html에 반영되게 만들고 싶을 때
   let[a, b] = useState(['남자 코트 추천', '강남 우동맛집', '리액트 연습']);
 
-  let[good, goodSet] = useState(0);
+  let[good, goodSet] = useState(new Array(a.length).fill(0)); // a의 개수만큼 0으로 초기화
+
+  let[modal,setModal] = useState(false);
 
   // onClick 안에는 함수 이름만만
-  function goodCount(){
-    console.log(1);
-    goodSet(good + 1);
+  function goodCount(i){
+    var copyArr = [...good];
+    copyArr[i] += 1;
+    goodSet(copyArr);
   }
 
   function changeName(){
-    b(['남자 코트 추천', '여자 코트 추천', '리액트 연습']);
+    // 변경 함수는 주소 혹은 값이 같으면 변경을 안함
+    // 그래서 [...state명] 으로 복사해야 주소값이 달라짐
+    // array/object일 경우 복사해서 변경하자자
+    var copy = [...a];
+    copy[0]= '여자 코트 추천';
+
+    b(copy);  
+  }
+
+  function sortArr(){
+    var copy = [...a];
+    copy.sort();
+
+    b(copy);
   }
 
   // return 안에는 병렬로 태그 2개 이상 기입금지
   return (
       <div className='App'>
 
+       
+        
+
+         
         <div className='black-nav'>
           <h4>블로그 글 제목</h4>
         </div>
-
+        <button onClick= {sortArr}>
+          정렬 버튼
+        </button>
+        { /*
         <div className="list">
           <h4>{ a[0] } <span onClick={ goodCount }>👍</span> {good} </h4>
           <p>2월 17일 발행</p>
@@ -51,14 +74,61 @@ function App() {
           <p>2월 17일 발행</p>
         </div>
        
+
         <div className="list">
-          <h4>{ a[2] }</h4>
+          <h4 onClick={ ()=>{ 
+            modal==true?setModal(false): setModal(true)  } }> 
+              { a[2] } 
+            </h4>
           <p>2월 17일 발행</p>
         </div>
+         */}
+         
+        {
+          a.map(function(a, i){
+            return(
+              <div className="list">
+
+                <h4 onClick={ ()=>{ modal==true ? setModal(false) : setModal(true)  } }>
+                  { a }  
+                </h4>
+
+                <span onClick={ () => goodCount(i) }>👍</span> {good[i]}
+
+                <p>2월 17일 발행</p>
+              </div> 
+              )})
+        }
+        
+
+        {
+          modal == true ? <Modal/> : null
+        }
+        
 
       </div>
 
   );
+}
+
+// 컴포넌트 만들기
+// 1. function 만들고 (funtion App 밖에다가가)
+// 2. return() 안에 html 담기
+// 3. <함수명></함수명> 쓰기
+
+// 어떤걸 컴포넌트로 만들까?
+// 1. 반복적인 html 축약할 때
+// 2. 큰 페이지들
+// 3. 자주 변경되는것들
+function Modal(){
+
+  return(
+    <div className="modal">
+      <h4>제목</h4>
+      <p>날짜</p>
+      <p>상세내용</p>
+    </div>
+  )
 }
 
 export default App
