@@ -27,6 +27,8 @@ function App() {
 
   let[modal,setModal] = useState(false);
 
+  let[userInput, setUserInput] = useState('');
+
 
 
   // onClick 안에는 함수 이름만만
@@ -55,6 +57,20 @@ function App() {
 
   function setPostNumber(i){
     setPostNum(i);
+  }
+
+  function addPost(title){
+    var copy = [...postName];
+    copy.push(title);
+
+    b(copy);
+  }
+
+  function deletePost(i){
+    var copy = [...postName];
+    copy.splice(i, 1);
+
+    b(copy);
   }
 
   // return 안에는 병렬로 태그 2개 이상 기입금지
@@ -90,19 +106,28 @@ function App() {
          */}
          
         {
-          postName.map(function(a, i){
+          postName.map( function(a, i) {
             return(
               <div className="list">
 
-                <h4 onClick={ () => { setModal(!modal), setPostNumber(i)  } }> { a } </h4>
-                <span onClick={ () => goodCount(i) }>👍</span> { good[i] }
+                <h4 onClick={ () => { setModal(!modal), setPostNumber(i)  } }> { a } 
+
+                  {/** 상위html로 퍼지는 이벤트 버블링 막으려면 e.stopPropagation(); */}
+                  <span onClick={ (e) => { e.stopPropagation(); goodCount(i) }}>👍</span> { good[i] }
+                  <button onClick={ (e) => { e.stopPropagation(); deletePost(i); }}> 삭제 </button>
+
+                </h4>
                 <p>2월 17일 발행</p>
                 
               </div> 
               )
-            })
+            }
+          )
         }
         
+        <input onChange={ (e) => {setUserInput(e.target.value);  console.log(userInput)}}/>
+        <button onClick={ ()=>{ addPost(userInput);} }> 버튼 </button>
+
         {
           // 부모 -> 자식 state 전송시 props 문법 사용
           modal == true ? <Modal color = {'skyblue'} 
