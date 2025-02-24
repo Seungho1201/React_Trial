@@ -19,11 +19,15 @@ function App() {
   // 두 번째 작명은 state 변경도와주는 함수
   // state 변경시 state 쓰던 html은 자동 재렌더링됨
   // state 언제 씀? -> 변경시 자동으로 html에 반영되게 만들고 싶을 때
-  let[a, b] = useState(['남자 코트 추천', '강남 우동맛집', '리액트 연습']);
+  // state는 state 사용하는 컴포넌트들 중 최상위 컴포넌트에 위치
+  let[postName, b] = useState(['남자 코트 추천', '강남 우동맛집', '리액트 연습']);
+  let[postNum, setPostNum] = useState(0);
 
-  let[good, goodSet] = useState(new Array(a.length).fill(0)); // a의 개수만큼 0으로 초기화
+  let[good, goodSet] = useState(new Array(postName.length).fill(0)); // a의 개수만큼 0으로 초기화
 
   let[modal,setModal] = useState(false);
+
+
 
   // onClick 안에는 함수 이름만만
   function goodCount(i){
@@ -36,30 +40,31 @@ function App() {
     // 변경 함수는 주소 혹은 값이 같으면 변경을 안함
     // 그래서 [...state명] 으로 복사해야 주소값이 달라짐
     // array/object일 경우 복사해서 변경하자자
-    var copy = [...a];
+    var copy = [...postName];
     copy[0]= '여자 코트 추천';
 
     b(copy);  
   }
 
   function sortArr(){
-    var copy = [...a];
+    var copy = [...postName];
     copy.sort();
 
     b(copy);
+  }
+
+  function setPostNumber(i){
+    setPostNum(i);
   }
 
   // return 안에는 병렬로 태그 2개 이상 기입금지
   return (
       <div className='App'>
 
-       
-        
-
-         
         <div className='black-nav'>
           <h4>블로그 글 제목</h4>
         </div>
+
         <button onClick= {sortArr}>
           정렬 버튼
         </button>
@@ -85,29 +90,28 @@ function App() {
          */}
          
         {
-          a.map(function(a, i){
+          postName.map(function(a, i){
             return(
               <div className="list">
 
-                <h4 onClick={ ()=>{ modal==true ? setModal(false) : setModal(true)  } }>
-                  { a }  
-                </h4>
-
-                <span onClick={ () => goodCount(i) }>👍</span> {good[i]}
-
+                <h4 onClick={ () => { setModal(!modal), setPostNumber(i)  } }> { a } </h4>
+                <span onClick={ () => goodCount(i) }>👍</span> { good[i] }
                 <p>2월 17일 발행</p>
+                
               </div> 
-              )})
+              )
+            })
         }
         
-
         {
-          modal == true ? <Modal/> : null
+          // 부모 -> 자식 state 전송시 props 문법 사용
+          modal == true ? <Modal color = {'skyblue'} 
+                                  postName = { postName } 
+                                  changeName = { changeName }
+                                  postNum = {postNum}/> : null
         }
         
-
       </div>
-
   );
 }
 
@@ -120,13 +124,14 @@ function App() {
 // 1. 반복적인 html 축약할 때
 // 2. 큰 페이지들
 // 3. 자주 변경되는것들
-function Modal(){
+function Modal(props){
 
   return(
-    <div className="modal">
-      <h4>제목</h4>
+    <div className="modal" style={{ background : props.color }}>
+      <h4> {props.postName[props.postNum]} </h4>
       <p>날짜</p>
       <p>상세내용</p>
+      <h3 onClick={props.changeName}>버튼</h3>
     </div>
   )
 }
